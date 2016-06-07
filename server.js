@@ -7,18 +7,18 @@ var app         = express();
 
 var bodyParser  = require('body-parser');
 
-var morgan      = require('morgan');
+//var morgan      = require('morgan');
 
-var mongoose    = require('mongoose');
+//var mongoose    = require('mongoose');
 
-var config 		= require('./config'); // get our config file
+//var config 		= require('./config'); // get our config file
 
 var port = 8080; // used to create, sign, and verify tokens
 
 
 //npm i sqlite3
 //npm install --save azure-mobile-apps
-var mobileApp = require('azure-mobile-apps')(); // Create an instance of a Mobile App with default settings
+//var mobileApp = require('azure-mobile-apps')(); // Create an instance of a Mobile App with default settings
 
 /*
 if(auth.validate(req.get('x-zumo-auth')))
@@ -27,15 +27,15 @@ else
     res.status(401).send("You must be logged in");
 */
 
-app.set('superSecret', config.secret); // secret variable
+//app.set('superSecret', config.secret); // secret variable
 
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(require('./controllers'));
+//app.use(require('./controllers'));
 
 // use morgan to log requests to the console
-app.use(morgan('dev'));
+//app.use(morgan('dev'));
 
 //GET
 app.get('/profile',(req,res)=>{
@@ -51,7 +51,7 @@ app.get('/profile',(req,res)=>{
 app.listen(port);
 console.log('web services now exposed at http://localhost:' + port);
 
-
+/*
 var strVar = "Ricky";
 var strVar1 = "6680";
 var strVar2 = "Ricky";
@@ -131,5 +131,5 @@ function executeStatement() {
     console.log("server.js - EXECUTE SQL");
     connection.execSql(request);
 }
-
+*/
 exports.app = app;
