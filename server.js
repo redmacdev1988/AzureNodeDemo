@@ -13,25 +13,19 @@ var mongoose    = require('mongoose');
 
 var config 		= require('./config'); // get our config file
 
-
-
-// =======================
-// configuration =========
-// =======================
 var port = 8080; // used to create, sign, and verify tokens
 
-/*
-mongoose.connect(config.database); // connect to database
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function (callback) {
-	console.log('mongoose db connected to ' + config.database);
-});
-*/
 
-//app.set(name, value)
-//Assigns setting name to application setting : value, 
-//where name is one of the properties from the
+//npm i sqlite3
+//npm install --save azure-mobile-apps
+var mobileApp = require('azure-mobile-apps')(); // Create an instance of a Mobile App with default settings
+
+/*
+if(auth.validate(req.get('x-zumo-auth')))
+    res.status(200).send("Successfully authenticated");
+else
+    res.status(401).send("You must be logged in");
+*/
 
 app.set('superSecret', config.secret); // secret variable
 
@@ -42,6 +36,17 @@ app.use(require('./controllers'));
 
 // use morgan to log requests to the console
 app.use(morgan('dev'));
+
+//GET
+app.get('/profile',(req,res)=>{
+ 
+    console.log("--- server.js - /profile GET ---");
+
+    res.json({
+     "url":"/profile",
+     "fileName":"server.js"    
+    });
+});
 
 app.listen(port);
 console.log('web services now exposed at http://localhost:' + port);
@@ -54,150 +59,77 @@ var strVar3 = "";
 
 var intVar = 6680;
 
-/*
-console.log('------------------- STRING AND INT types ---------------------');
-console.log('typeof ' + strVar + ' is ' + typeof(strVar));
-console.log('typeof ' + strVar1 + ' is ' + typeof(strVar1));
-console.log('typeof ' + strVar2 + ' is ' + typeof(strVar2));
-console.log('typeof ' + strVar3 + ' is ' + typeof(strVar3));
+//jdbc:sqlserver://azurenodedemo.database.windows.net:1433;database=azurenodedemo;user=rtsao@azurenodedemo;password={your_password_here};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
 
-console.log('typeof ' + intVar + ' is ' + typeof(intVar));
 
-var mixedVar = strVar + intVar;
-console.log('1) int + string is: ' + mixedVar + ', which is of type: ' + typeof(mixedVar));
+var tedConfig = {
+    userName: 'rtsao@azurenodedemo',
+    password: 'Tsao6680',
+    server:   'azurenodedemo.database.windows.net',
+    // If you are on Microsoft Azure, you need this:
+    options: {encrypt: true, database: 'azurenodedemo'}
+};
 
-//int + string = string
-var mixedVar1 = intVar + strVar1;
-console.log('2) int + string is: ' + mixedVar1 + ', which is of type: ' + typeof(mixedVar1));
+var Connection = require('tedious').Connection;
 
-//true + string = string
-var bVar = true;
-var mixedVar2 = bVar + strVar;
-console.log('3) true + string is: ' + mixedVar2 + ', which is of type: ' + typeof(mixedVar2));
+//create new connection
+var connection = new Connection(tedConfig);
+connection.on('connect', function(err) {
 
-//true gets evaluated to int 1, hence result is 11
-var mixedVar3 = bVar + 10;
-console.log('4) true + int is: ' + mixedVar3 + ', which is of type: ' + typeof(mixedVar3));
+    if (err) return console.error(err);
 
-//"Ricky" and "Ricky"
-if(strVar === strVar2) {
-	console.log( typeof(strVar) + ' ' + strVar + ', and ' 
-		+ typeof(strVar2) + ' ' + strVar2 + ', are ===' );
+    console.log("Connected!!");
+    executeStatement();
+
+
+});
+
+
+var Request = require('tedious').Request;
+var TYPES   = require('tedious').TYPES;
+
+function executeStatement() {
+	
+    var createStmt = "CREATE TABLE Persons ( PersonID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255) );";
+    var getAllTableNames = "SELECT name FROM sys.tables";
+    var showColumnNames = "select name from syscolumns where id=object_id('Persons')";
+
+    request = new Request(showColumnNames, function(err) {
+    if (err) {
+        console.log(err);}
+    });
+
+    var result = "";
+
+    //Node.js is evented, thus listening for events
+
+    // listen for 'row' event
+    request.on('row', function(columns) {
+
+        columns.forEach(function(column) {
+
+          //console.dir(column);
+
+          if (column.value === null) {
+            console.log('server.js - column value is NULL');
+          } else {
+            result += column.value + ", ";
+          }
+
+        });
+
+        console.log(result);
+        result ="\n\n";
+    });
+
+    // listen for 'done' event
+    request.on('done', function(rowCount, more) {
+      console.log("server.js - ALL DONE");
+      console.log(rowCount + ' rows returned');
+    });
+
+    console.log("server.js - EXECUTE SQL");
+    connection.execSql(request);
 }
 
-//"Ricky" and "6680"
-if(strVar !== strVar1) {
-	console.log( typeof(strVar) + ' ' + strVar + ', and ' 
-		+ typeof(strVar1) + ' ' + strVar1 + ', are !==' );
-}
-
-//"Ricky" and "Ricky"
-if(intVar !== strVar1) {
-	console.log( typeof(intVar) + ' ' + intVar + ', and ' 
-		+ typeof(strVar1) + ' ' + strVar1 + ', are !==' );
-}
-
-//"Ricky" and "Ricky"
-if(intVar == strVar1) {
-	console.log( typeof(intVar) + ' ' + intVar + ', and ' 
-		+ typeof(strVar1) + ' ' + strVar1 + ', are ==' );
-}
-
-var boolTrueVar = true;
-var boolFalseVar = false;
-
-console.log("-------------- TRUE/FALSE types -------------------");
-
-console.log('typeof ' + boolTrueVar + ' is ' + typeof(boolTrueVar));
-console.log('typeof ' + boolFalseVar + ' is ' + typeof(boolFalseVar));
-
-if(boolTrueVar === boolTrueVar) {
-	console.log( typeof(boolTrueVar) + ' ' + boolTrueVar + ', and ' 
-		+ typeof(boolTrueVar) + ' ' + boolTrueVar + ', are ===' );
-}
-
-if(boolTrueVar !== "true") {
-	console.log( typeof(boolTrueVar) + ' ' + boolTrueVar + ', and ' 
-		+ typeof("true") + ' ' + "true" + ', are !==' );
-}
-
-if(boolTrueVar !== boolFalseVar) {
-	console.log( typeof(boolTrueVar) + ' ' + boolTrueVar + ', and ' 
-		+ typeof(boolFalseVar) + ' ' + boolFalseVar + ', are !==' );
-}
-
-if(boolTrueVar == 1) {
-	console.log( typeof(boolTrueVar) + ' ' + boolTrueVar + ', and ' 
-		+ typeof(1) + ' ' + 1 + ', are ==' );
-}
-
-if(boolTrueVar == "1") {
-	console.log( typeof(boolTrueVar) + ' ' + boolTrueVar + ', and ' 
-		+ typeof("1") + ' ' + "1" + ', are ==' );
-}
-
-
-
-if(boolTrueVar != "hello") {
-	console.log( typeof(boolTrueVar) + ' ' + boolTrueVar + ', and ' 
-		+ typeof("hello") + ' ' + "hello" + ', are !=' );
-}
-
-if(boolTrueVar != "true") {
-	console.log( typeof(boolTrueVar) + ' ' + boolTrueVar + ', and ' 
-		+ typeof("true") + ' ' + "true" + ', are !=' );
-}
-
-
-if(boolTrueVar != 5) {
-	console.log( typeof(boolTrueVar) + ' ' + boolTrueVar + ', and ' 
-		+ typeof(5) + ' ' + 5 + ', are !=' );
-}
-
-if(boolFalseVar === boolFalseVar) {
-	console.log( typeof(boolFalseVar) + ' ' + boolFalseVar + ', and ' 
-		+ typeof(boolFalseVar) + ' ' + boolFalseVar + ', are ===' );
-}
-
-if(boolFalseVar == "0") {
-	console.log( typeof(boolFalseVar) + ' ' + boolFalseVar + ', and ' 
-		+ typeof("0") + ' ' + "0" + ', are ==' );
-}
-
-if(boolFalseVar != "false") {
-	console.log( typeof(boolFalseVar) + ' ' + boolFalseVar + ', and ' 
-		+ typeof("false") + ' ' + "false" + ', are !=' );
-}
-
-if(boolFalseVar !== "false") {
-	console.log( typeof(boolFalseVar) + ' ' + boolFalseVar + ', and ' 
-		+ typeof("false") + ' ' + "false" + ', are !==' );
-}
-
-if(boolFalseVar != "hehe") {
-	console.log( typeof(boolFalseVar) + ' ' + boolFalseVar + ', and ' 
-		+ typeof("hehe") + ' ' + "hehe" + ', are !=' );
-}
-
-if(boolFalseVar == 0) {
-	console.log( typeof(boolFalseVar) + ' ' + boolFalseVar + ', and ' 
-		+ typeof(0) + ' ' + 0 + ', are ==' );
-}
-
-console.log('-------------- NULL UNDEFINED TYPES ---------------');
-
-var nullVar = null;
-var unDefVar = undefined;
-
-//null is object
-console.log('typeof ' + nullVar + ' is ' + typeof(nullVar));
-console.dir(nullVar);
-
-//undefined is type undefined 
-console.log('typeof ' + unDefVar + ' is ' + typeof(unDefVar));
-
-console.log('null + null is: ' + (nullVar + nullVar) + ', which is of type: ' + typeof(nullVar + nullVar));
-console.log('null + 1 is: ' + (nullVar + 1) + ', which is of type: ' + typeof(nullVar + 1));
-console.log('null + abc is: ' + (nullVar + 'abc') + ', which is of type: ' + typeof(nullVar + 'abc'));
-*/
 exports.app = app;
