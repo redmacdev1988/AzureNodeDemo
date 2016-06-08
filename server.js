@@ -24,7 +24,10 @@ if(app) {
    console.log(config.secret + ", " + config.database);
  }
 
-//var bodyParser  = require('body-parser');
+var bodyParser  = require('body-parser');
+if(bodyParser) {
+  console.log("body-parser loaded");
+}
 //var morgan      = require('morgan');
  
 var http = require('http');
@@ -35,10 +38,16 @@ http.createServer(function(req, res) {
   res.end('Hello World\n');
 }).listen(port);
 
+app.set('superSecret', config.secret); // secret variable
+console.log("app sets config superSecret");
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+console.log("app uses bodyParser json");
 
+app.use(require('./controllers'));
 
-
+console.log("app requires ./controllers");
 /*
  
 app.set('superSecret', config.secret); // secret variable
