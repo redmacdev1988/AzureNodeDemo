@@ -9,19 +9,37 @@ http.createServer(function(req, res) {
 
 
 var express     = require('express');
- 
+if(express) {
+  console.log("express loaded");
+}
+
 var app         = express();
+if(app) {
+  console.log("app loaded");
+}
  
-var bodyParser  = require('body-parser');
+ var config 		= require('./config'); // get our config file
+ if(config) {
+   console.log("config loaded");
+   console.log(config.secret + ", " + config.database);
+ }
+
+//var bodyParser  = require('body-parser');
+//var morgan      = require('morgan');
  
-var morgan      = require('morgan');
- 
-var mongoose    = require('mongoose');
- 
-var config 		= require('./config'); // get our config file
+var http = require('http');
+
+var port = process.env.PORT || 1337;
+http.createServer(function(req, res) {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Hello World\n');
+}).listen(port);
 
 
-var port = 8080; // used to create, sign, and verify tokens
+
+
+
+/*
  
 app.set('superSecret', config.secret); // secret variable
  
@@ -37,3 +55,4 @@ app.listen(port);
 console.log('web services now exposed at http://localhost:' + port);
  
  exports.app = app;
+ */
