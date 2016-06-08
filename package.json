@@ -2,25 +2,15 @@
   "name": "book_api",
   "version": "0.0.0",
   "description": "sample project i'm doing",
-  "main": "index.js",
+  "main": "server.js",
   "dependencies": {
-    "azure-mobile-apps": "^2.1.7",
-    "body-parser": "^1.13.1",
-    "express": "^4.13.0",
-    "gulp": "^3.9.0",
-    "jsonwebtoken": "^5.0.2",
-    "mongoose": "^4.0.6",
-    "morgan": "^1.6.0"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "book",
-    "api",
-    "sample",
-    "project"
+    "sample"
   ],
   "author": "ricky",
   "license": "ISC"
