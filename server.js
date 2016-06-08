@@ -33,10 +33,14 @@ if(bodyParser) {
 var http = require('http');
 
 var port = process.env.PORT || 1337;
+
+/*
 http.createServer(function(req, res) {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('Hello World\n');
 }).listen(port);
+*/
+
 
 app.set('superSecret', config.secret); // secret variable
 console.log("app sets config superSecret");
@@ -48,14 +52,12 @@ console.log("app uses bodyParser json");
 app.use(require('./controllers'));
 
 console.log("app requires ./controllers");
+
+app.listen(port);
+console.log('server.js - web services now exposed at http://localhost:' + port);
+exports.app = app;
+
 /*
- 
-app.set('superSecret', config.secret); // secret variable
- 
-// use body parser so we can get info from POST and/or URL parameters
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(require('./controllers'));
  
 // use morgan to log requests to the console
 app.use(morgan('dev'));
